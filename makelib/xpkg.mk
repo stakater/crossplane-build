@@ -61,6 +61,7 @@ XPKG_PLATFORMS := $(subst _,/,$(subst $(SPACE),$(COMMA),$(filter linux_%,$(PLATF
 XPKG_PLATFORMS_LIST := $(subst _,/,$(filter linux_%,$(PLATFORMS)))
 XPKG_PLATFORM := $(subst _,/,$(PLATFORM))
 
+# TODO(negz): Update these targets to use the crossplane CLI, not up.
 UP ?= up
 
 # =====================================================================================

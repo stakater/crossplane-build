@@ -13,23 +13,27 @@
 # limitations under the License.
 
 KIND_CLUSTER_NAME ?= local-dev
-CROSSPLANE_NAMESPACE ?= upbound-system
+CROSSPLANE_NAMESPACE ?= crossplane-system
+CROSSPLANE_VERSION ?=
 
 CONTROLPLANE_DUMP_DIRECTORY ?= $(OUTPUT_DIR)/controlplane-dump
 
-controlplane.up: $(UP) $(KUBECTL) $(KIND)
+controlplane.up: $(HELM) $(KUBECTL) $(KIND)
 	@$(INFO) setting up controlplane
 	@$(KIND) get kubeconfig --name $(KIND_CLUSTER_NAME) >/dev/null 2>&1 || $(KIND) create cluster --name=$(KIND_CLUSTER_NAME)
 	@$(INFO) "setting kubectl context to kind-$(KIND_CLUSTER_NAME)"
 	@$(KUBECTL) config use-context "kind-$(KIND_CLUSTER_NAME)"
+	@$(HELM) repo add crossplane-stable https://charts.crossplane.io/stable
+	@$(HELM) repo update
 ifndef CROSSPLANE_ARGS
 	@$(INFO) setting up crossplane core without args
-	@$(KUBECTL) -n $(CROSSPLANE_NAMESPACE) get cm universal-crossplane-config >/dev/null 2>&1 || $(UP) uxp install $(UXP_VERSION) --namespace=$(CROSSPLANE_NAMESPACE) $(UXP_INSTALL_OPTS)
+	@$(KUBECTL) -n $(CROSSPLANE_NAMESPACE) get cm universal-crossplane-config >/dev/null 2>&1 || $(HELM) install crossplane --create-namespace --namespace=$(CROSSPLANE_NAMESPACE) crossplane-stable/crossplane --version $(CROSSPLANE_VERSION)
 else
 	@$(INFO) setting up crossplane core with args $(CROSSPLANE_ARGS)
-	@$(KUBECTL) -n $(CROSSPLANE_NAMESPACE) get cm universal-crossplane-config >/dev/null 2>&1 || $(UP) uxp install $(UXP_VERSION) --namespace=$(CROSSPLANE_NAMESPACE) $(UXP_INSTALL_OPTS) --set "args={${CROSSPLANE_ARGS}}"
+	@$(KUBECTL) -n $(CROSSPLANE_NAMESPACE) get cm universal-crossplane-config >/dev/null 2>&1 || $(HELM) install crossplane --create-namespace --namespace=$(CROSSPLANE_NAMESPACE) --set "args={${CROSSPLANE_ARGS}}" crossplane-stable/crossplane --version $(CROSSPLANE_VERSION)
 endif
-controlplane.down: $(UP) $(KUBECTL) $(KIND)
+
+controlplane.down: $(KIND)
 	@$(INFO) deleting controlplane
 	@$(KIND) delete cluster --name=$(KIND_CLUSTER_NAME)
 	@$(OK) deleting controlplane
