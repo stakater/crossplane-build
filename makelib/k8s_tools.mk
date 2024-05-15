@@ -51,14 +51,14 @@ CROSSPLANE_CLI_CHANNEL ?= stable
 CROSSPLANE_CLI := $(TOOLS_HOST_DIR)/crossplane-cli-$(CROSSPLANE_CLI_VERSION)
 
 # the version of helm 3 to use
-USE_HELM3 ?= false
-HELM3_VERSION ?= v3.9.1
-HELM3 := $(TOOLS_HOST_DIR)/helm-$(HELM3_VERSION)
+USE_HELM ?= false
+HELM_VERSION ?= v3.9.1
+HELM := $(TOOLS_HOST_DIR)/helm-$(HELM_VERSION)
 
-# If we enable HELM3 we alias HELM to be HELM3
-ifeq ($(USE_HELM3),true)
-HELM_VERSION ?= $(HELM3_VERSION)
-HELM := $(HELM3)
+# If we enable HELM we alias HELM to be HELM
+ifeq ($(USE_HELM),true)
+HELM_VERSION ?= $(HELM_VERSION)
+HELM := $(HELM)
 else
 HELM_VERSION ?= v2.17.0
 HELM := $(TOOLS_HOST_DIR)/helm-$(HELM_VERSION)
@@ -90,7 +90,6 @@ k8s_tools.buildvars:
 	@echo OLM_BUNDLE=$(OLM_BUNDLE)
 	@echo UP=$(UP)
 	@echo HELM=$(HELM)
-	@echo HELM3=$(HELM3)
 	@echo KUTTL=$(KUTTL)
 	@echo CHAINSAW=$(CHAINSAW)
 	@echo YQ=$(YQ)
@@ -154,8 +153,7 @@ $(CROSSPLANE_CLI):
 	@chmod +x $(CROSSPLANE_CLI)
 	@$(OK) installing Crossplane CLI $(CROSSPLANE_CLI_VERSION)
 
-# helm download and install only if helm3 not enabled
-ifeq ($(USE_HELM3),false)
+# helm download and install
 $(HELM):
 	@$(INFO) installing helm $(HELM_VERSION)
 	@mkdir -p $(TOOLS_HOST_DIR)/tmp-helm
@@ -163,16 +161,6 @@ $(HELM):
 	@mv $(TOOLS_HOST_DIR)/tmp-helm/$(SAFEHOSTPLATFORM)/helm $(HELM)
 	@rm -fr $(TOOLS_HOST_DIR)/tmp-helm
 	@$(OK) installing helm $(HELM_VERSION)
-endif
-
-# helm3 download and install
-$(HELM3):
-	@$(INFO) installing helm3 $(HELM_VERSION)
-	@mkdir -p $(TOOLS_HOST_DIR)/tmp-helm3
-	@curl -fsSL https://get.helm.sh/helm-$(HELM3_VERSION)-$(SAFEHOSTPLATFORM).tar.gz | tar -xz -C $(TOOLS_HOST_DIR)/tmp-helm3
-	@mv $(TOOLS_HOST_DIR)/tmp-helm3/$(SAFEHOSTPLATFORM)/helm $(HELM3)
-	@rm -fr $(TOOLS_HOST_DIR)/tmp-helm3
-	@$(OK) installing helm3 $(HELM_VERSION)
 
 # kuttl download and install
 $(KUTTL):
