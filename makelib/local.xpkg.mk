@@ -13,7 +13,7 @@
 # limitations under the License.
 
 KIND_CLUSTER_NAME ?= local-dev
-CROSSPLANE_NAMESPACE ?= upbound-system
+CROSSPLANE_NAMESPACE ?= crossplane-system
 XPKG_SKIP_DEP_RESOLUTION ?= false
 
 local.xpkg.init: $(KUBECTL)
@@ -24,6 +24,9 @@ local.xpkg.init: $(KUBECTL)
 		$(KUBECTL) -n $(CROSSPLANE_NAMESPACE) wait pods -l app=crossplane,patched=true --for condition=Ready --timeout=60s; \
 	fi
 	@$(OK) patching Crossplane with dev sidecar
+
+# TODO(negz): Update this target to use the crossplane CLI, not up. We'll need
+# to add the `xpkg extract` subcommand to the crossplane CLI.
 
 local.xpkg.sync: local.xpkg.init $(UP)
 	@$(INFO) copying local xpkg cache to Crossplane pod
