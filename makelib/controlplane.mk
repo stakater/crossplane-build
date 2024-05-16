@@ -27,10 +27,10 @@ controlplane.up: $(HELM) $(KUBECTL) $(KIND)
 	@$(HELM) repo update
 ifndef CROSSPLANE_ARGS
 	@$(INFO) setting up crossplane core without args
-	@$(KUBECTL) -n $(CROSSPLANE_NAMESPACE) get cm universal-crossplane-config >/dev/null 2>&1 || $(HELM) install crossplane --create-namespace --namespace=$(CROSSPLANE_NAMESPACE) crossplane-stable/crossplane --version $(CROSSPLANE_VERSION)
+	@$(HELM) get notes -n $(CROSSPLANE_NAMESPACE) crossplane >/dev/null 2>&1 || $(HELM) install crossplane --create-namespace --namespace=$(CROSSPLANE_NAMESPACE) crossplane-stable/crossplane --version $(CROSSPLANE_VERSION)
 else
 	@$(INFO) setting up crossplane core with args $(CROSSPLANE_ARGS)
-	@$(KUBECTL) -n $(CROSSPLANE_NAMESPACE) get cm universal-crossplane-config >/dev/null 2>&1 || $(HELM) install crossplane --create-namespace --namespace=$(CROSSPLANE_NAMESPACE) --set "args={${CROSSPLANE_ARGS}}" crossplane-stable/crossplane --version $(CROSSPLANE_VERSION)
+	@$(HELM) get notes -n $(CROSSPLANE_NAMESPACE) crossplane >/dev/null 2>&1 || $(HELM) install crossplane --create-namespace --namespace=$(CROSSPLANE_NAMESPACE) --set "args={${CROSSPLANE_ARGS}}" crossplane-stable/crossplane --version $(CROSSPLANE_VERSION)
 endif
 
 controlplane.down: $(KIND)
