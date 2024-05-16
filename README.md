@@ -4,10 +4,10 @@ This project - commonly known as "the build submodule" -  is Crossplane's
 Makefile library. This library is used to build `crossplane/crossplane`,
 `crossplane/crossplane-runtime`, and most Crossplane providers.
 
-The build submodule is only intended to support Crossplane. There's no guarantee
-of stability. There are no releases or versions, and any commit may introduce a
-breaking change. Third parties are recommended to fork rather than taking a
-dependency.
+The build submodule is only intended to support Crossplane and its extensions.
+There's no guarantee of stability. There are no releases or versions, and any
+commit may introduce a breaking change. Third parties are recommended to fork
+rather than taking a dependency.
 
 # Quickstart
 
