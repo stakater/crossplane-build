@@ -198,3 +198,8 @@ $(GOLANGCILINT):
 	@mv $(TOOLS_HOST_DIR)/tmp-golangci-lint/golangci-lint $(GOLANGCILINT) || $(FAIL)
 	@rm -fr $(TOOLS_HOST_DIR)/tmp-golangci-lint
 	@$(OK) installing golangci-lint-v$(GOLANGCILINT_VERSION) $(SAFEHOSTPLATFORM)
+
+# These targets are deprecated but are still used by some existing repos.
+# The modules targets should be used instead.
+vendor: modules.download
+vendor.check: modules.check
