@@ -24,6 +24,10 @@ ifeq ($(HOSTOS),darwin)
 ISTIO_DOWNLOAD_TUPLE := osx-$(SAFEHOSTARCH)
 endif
 
+# the version of kcl to use
+KCL_VERSION ?= v0.9.5
+KCL := $(TOOLS_HOST_DIR)/kcl-$(KCL_VERSION)
+
 # the version of kind to use
 KIND_VERSION ?= v0.23.0
 KIND := $(TOOLS_HOST_DIR)/kind-$(KIND_VERSION)
@@ -84,6 +88,7 @@ YQ := $(TOOLS_HOST_DIR)/yq-$(YQ_VERSION)
 # Common Targets
 
 k8s_tools.buildvars:
+	@echo KCL=$(KCL)
 	@echo KIND=$(KIND)
 	@echo KUBECTL=$(KUBECTL)
 	@echo KUSTOMIZE=$(KUSTOMIZE)
@@ -107,6 +112,17 @@ $(ISTIO):
 	@mv $(TOOLS_HOST_DIR)/tmp-istio/istio-$(ISTIO_VERSION)/bin/istioctl $(ISTIO) || $(FAIL)
 	@rm -fr $(TOOLS_HOST_DIR)/tmp-istio || $(FAIL)
 	@$(OK) $(ISTIO) installing istio $(ISTIO_VERSION)
+
+# kcl download and install
+$(KCL):
+	@$(INFO) installing kcl $(KCL_VERSION)
+	@mkdir -p $(TOOLS_HOST_DIR)/tmp-kcl || $(FAIL)
+	@mkdir -p $(TOOLS_HOST_DIR)
+	@curl -fsSL https://github.com/kcl-lang/cli/releases/download/$(KCL_VERSION)/kcl-$(KCL_VERSION)-$(SAFEHOSTPLATFORM).tar.gz | tar -xz -C $(TOOLS_HOST_DIR)/tmp-kcl || $(FAIL)
+	@mv $(TOOLS_HOST_DIR)/tmp-kcl/kcl $(KCL) || $(FAIL)
+	@rm -fr $(TOOLS_HOST_DIR)/tmp-kcl || $(FAIL)
+	@chmod +x $(KCL)
+	@$(OK) installing kcl $(KCL_VERSION)
 
 # kind download and install
 $(KIND):
